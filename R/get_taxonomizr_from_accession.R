@@ -21,9 +21,8 @@ get_taxonomizr_from_accession <- function(input, accessionTaxa_path,
                                 "subspecies", "subgenus", "species group",
                                 "parvorder", "varietas"))
 
-  
-    output <- dplyr::left_join(tibble::tibble(taxid = input_taxids,
-                     data.frame(input_taxonomy)),output, by = "taxid")
+    output <- tibble::tibble(taxid = input_taxids,
+                     data.frame(input_taxonomy)) %>% dplyr::left_join(output, by = "taxid")
 
 
     if (!"species" %in% colnames(output)) {
