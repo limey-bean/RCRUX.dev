@@ -12,7 +12,7 @@ get_taxonomizr_from_accession <- function(input, accessionTaxa_path,
     input_taxids <- taxonomizr::accessionToTaxa(input$accession,
                                             accessionTaxa_path)
 
-    unique_taxid <- dplyr::distinct(input_taxid, "taxid")
+    unique_taxid <- dplyr::distinct(input_taxids, "taxid")
 
 
     input_taxonomy <- taxonomizr::getTaxonomy(unique_taxid, accessionTaxa_path,
