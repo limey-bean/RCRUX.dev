@@ -12,7 +12,10 @@ get_taxonomizr_from_accession <- function(input, accessionTaxa_path,
     input_taxids <- taxonomizr::accessionToTaxa(input$accession,
                                             accessionTaxa_path)
 
-    input_taxonomy <- taxonomizr::getTaxonomy(input_taxids, accessionTaxa_path,
+    unique_taxid <- dplyr::distinct(input_taxid, "taxid")
+
+
+    input_taxonomy <- taxonomizr::getTaxonomy(unique_taxid, accessionTaxa_path,
                                 desiredTaxa = c("species", "superkingdom",
                                 "kingdom", "phylum", "subphylum", "superclass",
                                 "class", "subclass", "order", "family",
@@ -21,8 +24,8 @@ get_taxonomizr_from_accession <- function(input, accessionTaxa_path,
                                 "subspecies", "subgenus", "species group",
                                 "parvorder", "varietas"))
 
-    output <- tibble::tibble(taxid = input_taxids,
-                     data.frame(input_taxonomy)) %>% dplyr::left_join(input, by = "taxid")
+
+    output <-  dplyr::left_join(input_taxid, input_taxonomy, by = "taxid")
 
 
     if (!"species" %in% colnames(output)) {
