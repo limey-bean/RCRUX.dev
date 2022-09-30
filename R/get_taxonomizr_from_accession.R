@@ -23,7 +23,7 @@ get_taxonomizr_from_accession <- function(input, accessionTaxa_path,
 
     output <- tibble(taxid = input_taxids,
                      data.frame(input_taxonomy)) %>%
-                    left_join(output, by = "taxid")
+                    dplyr::left_join(output, by = "taxid")
 
     if (!"species" %in% colnames(output)) {
         stop("Failed to create column `species` in output.
