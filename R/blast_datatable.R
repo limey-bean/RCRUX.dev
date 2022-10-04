@@ -111,6 +111,7 @@ blast_datatable <- function(blast_seeds, save_dir, db, accession_taxa_path,
 
 
     # information about state of blast
+    message(" ")
     message(paste("BLAST round", num_rounds))
     message(paste(length(unsampled_indices), "indices left to process."))
 
@@ -130,8 +131,6 @@ blast_datatable <- function(blast_seeds, save_dir, db, accession_taxa_path,
     else  {
 
 
-
-
       # if more indices than the max_to_blast are present
       # randomly select entries (default is n=1) for each rank then turn the
       # accession numbers into a vector
@@ -143,8 +142,20 @@ blast_datatable <- function(blast_seeds, save_dir, db, accession_taxa_path,
       sample_indices <- which(blast_seeds_m$accession %in% seeds_by_rank_indices)
     }
 
-    message(paste(rank, "has", length(sample_indices), "unique occurrences in the blast seeds data table."))
-    message(paste("These will be subsets into chunks of ", max_to_blast, " indices or fewer" ))
+
+    # clean up messages
+    if (length(unsampled_indices) > max_to_blast) {
+     message(" ")
+     message(paste(rank, "has", length(sample_indices), "unique occurrences in the blast seeds data table."))
+     message(paste("These may be subset..." ))
+
+    } else {
+
+     message(" ")
+     message("The number of unsampled indices is less than or equal to the maximum number to be blasted")
+
+    }
+
 
     # update unsampled_indices by removing the sample_indices from the list
     unsampled_indices <-
@@ -157,9 +168,9 @@ blast_datatable <- function(blast_seeds, save_dir, db, accession_taxa_path,
     # it will run.  If not the number of indices to be blasted for a rank will be
     # broken into the max_to_blast value.
 
-    end <- FALSE
 
-    while (length(sample_indices) > 0 || end == FALSE){
+
+    while (length(sample_indices) > 0 ){
 
 
       # Pick up where it left off
@@ -189,28 +200,34 @@ blast_datatable <- function(blast_seeds, save_dir, db, accession_taxa_path,
 
       }
 
-      if (length(unsampled_indices) <= max_to_blast) {
 
+      if (length(sample_indices) == length(unsampled_indices)) {
 
         run_blastdbcmd_blastn_and_aggregate_resuts(unsampled_indices, save_dir,
-            blast_seeds_m, db, ncbi_bin = NULL, too_many_ns, db_dir,
-            blastdbcmd_failed, unsampled_indices, output_table, wildcards,
-            num_rounds)
+          blast_seeds_m, db, ncbi_bin = NULL, too_many_ns, db_dir,
+          blastdbcmd_failed, unsampled_indices, output_table, wildcards,
+          num_rounds)
 
-            end <- TRUE
 
-            break
+
+          unsampled_indices <- unsampled_indices[!(unsampled_indices)]
+
+          break
 
 
       } else if (length(sample_indices) <= max_to_blast) {
 
 
-      run_blastdbcmd_blastn_and_aggregate_resuts(sample_indices, save_dir,
+        run_blastdbcmd_blastn_and_aggregate_resuts(sample_indices, save_dir,
             blast_seeds_m, db, ncbi_bin = NULL, too_many_ns, db_dir,
             blastdbcmd_failed, unsampled_indices, output_table, wildcards,
             num_rounds)
 
-      break
+
+
+        sample_indices <- sample_indices[!(sample_indices)]
+
+        break
 
       } else {
 
@@ -229,7 +246,9 @@ blast_datatable <- function(blast_seeds, save_dir, db, accession_taxa_path,
       }
 
 
+
     }
+
 
 
         rm(output_table)
